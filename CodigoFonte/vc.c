@@ -1072,13 +1072,3 @@ int vc_binary_erode(IVC *image, IVC *converted, int kernel)
 	}
 	return 1;
 }
-
-int vc_binary_open(IVC *image, IVC *converted, int kernel)
-{
-	IVC *temp;
-	temp = vc_image_new(image->width, image->height, 1, 1);
-
-	vc_binary_erode(image, temp, kernel);
-	vc_binary_dilate(temp, converted, kernel);
-	return 1;
-}

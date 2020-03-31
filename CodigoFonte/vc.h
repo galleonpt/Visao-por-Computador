@@ -62,7 +62,6 @@ int vc_gray_to_binary_global_mean(IVC *image, IVC *result);
 int vc_gray_to_binary_midpoint(IVC *src, IVC *dst, int kernel);
 int vc_gray_to_binary_bernsen(IVC *src, IVC *dst, int kernel, int Cmin);
 int vc_gray_to_binary_niBlack(IVC *original, IVC *converted, int kernel, float k);
-int vc_binary_dilate(IVC *src, IVC *dst, int kernel);
 int vc_binary_dilate(IVC *original, IVC *converted, int kernel);
 int vc_binary_erode(IVC *image, IVC *converted, int kernel);
 int vc_binary_open(IVC *image, IVC *converted, int kernel);
