@@ -618,32 +618,59 @@
 #pragma endregion
 
 #pragma region Erode
+// int main(void)
+// {
+//   IVC *image = vc_read_image("../ImagesTestSegmentation/coins.pgm");
+//   IVC *threshold = vc_image_new(image->width, image->height, 1, 1);
+//   IVC *result = vc_image_new(image->width, image->height, 1, 1);
+
+//   if (vc_gray_to_binary_global_mean(image, threshold) == 0)
+//   {
+//     puts("Erro!!!");
+//     getchar();
+//     return 0;
+//   }
+
+//   if (vc_binary_erode(threshold, result, 3) == 0)
+//   {
+//     puts("Erro!!!");
+//     getchar();
+//     return 0;
+//   }
+//   else
+//   {
+//     vc_write_image("../Results/binary(erode).pbm", result);
+//     vc_image_free(image);
+//     puts("Carregue numa tecla para sair...");
+//     getchar();
+//     return 0;
+//   }
+// }
+#pragma endregion
+
+#pragma region Labelling
 int main(void)
 {
+
   IVC *image = vc_read_image("../ImagesTestSegmentation/coins.pgm");
-  IVC *threshold = vc_image_new(image->width, image->height, 1, 1);
-  IVC *result = vc_image_new(image->width, image->height, 1, 1);
+  IVC *dst = vc_image_new(image->width, image->height, 1, 255);
+  IVC *threshold = vc_image_new(image->width, image->height, 1, 255);
+  IVC *result = vc_image_new(image->width, image->height, 1, 255);
+  vc_gray_to_binary_global_mean(image, threshold);
 
-  if (vc_gray_to_binary_global_mean(image, threshold) == 0)
+  int nlabel = 0;
+  OVC *blobs = vc_binary_blob_labelling(threshold, dst, &nlabel);
+
+  if (vc_binary_blob_info(image, blobs, nlabel) == 0)
   {
-    puts("Erro!!!");
+    printf("Erro!");
     getchar();
     return 0;
   }
 
-  if (vc_binary_erode(threshold, result, 3) == 0)
-  {
-    puts("Erro!!!");
-    getchar();
-    return 0;
-  }
-  else
-  {
-    vc_write_image("../Results/binary(erode).pbm", result);
-    vc_image_free(image);
-    puts("Carregue numa tecla para sair...");
-    getchar();
-    return 0;
-  }
+  vc_write_image("../Results/labelling.pgm", dst);
+  printf("press any key to exit.....\n");
+  getchar();
+  return 0;
 }
 #pragma endregion

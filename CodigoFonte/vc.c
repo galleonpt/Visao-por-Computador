@@ -1281,84 +1281,85 @@ OVC *vc_binary_blob_labelling(IVC *src, IVC *dst, int *nlabels)
 
 		return blobs;
 	}
+}
 
-	int vc_binary_blob_info(IVC * src, OVC * blobs, int nblobs)
+int vc_binary_blob_info(IVC *src, OVC *blobs, int nblobs)
+{
+	unsigned char *data = (unsigned char *)src->data;
+	int width = src->width;
+	int height = src->height;
+	int bytesperline = src->bytesperline;
+	int channels = src->channels;
+	int x, y, i;
+	long int pos;
+	int xmin, ymin, xmax, ymax;
+	long int sumx, sumy;
+
+	if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
+		return 0;
+	if (channels != 1)
+		return 0;
+
+	// Conta �rea de cada blob
+	for (i = 0; i < nblobs; i++)
 	{
-		unsigned char *data = (unsigned char *)src->data;
-		int width = src->width;
-		int height = src->height;
-		int bytesperline = src->bytesperline;
-		int channels = src->channels;
-		int x, y, i;
-		long int pos;
-		int xmin, ymin, xmax, ymax;
-		long int sumx, sumy;
+		xmin = width - 1;
+		ymin = height - 1;
+		xmax = 0;
+		ymax = 0;
 
-		if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
-			return 0;
-		if (channels != 1)
-			return 0;
+		sumx = 0;
+		sumy = 0;
 
-		// Conta �rea de cada blob
-		for (i = 0; i < nblobs; i++)
+		blobs[i].area = 0;
+
+		for (y = 1; y < height - 1; y++)
 		{
-			xmin = width - 1;
-			ymin = height - 1;
-			xmax = 0;
-			ymax = 0;
-
-			sumx = 0;
-			sumy = 0;
-
-			blobs[i].area = 0;
-
-			for (y = 1; y < height - 1; y++)
+			for (x = 1; x < width - 1; x++)
 			{
-				for (x = 1; x < width - 1; x++)
+				pos = y * bytesperline + x * channels;
+
+				if (data[pos] == blobs[i].label)
 				{
-					pos = y * bytesperline + x * channels;
+					// �rea
+					blobs[i].area++;
 
-					if (data[pos] == blobs[i].label)
+					// Centro de Gravidade
+					sumx += x;
+					sumy += y;
+
+					// Bounding Box
+					if (xmin > x)
+						xmin = x;
+					if (ymin > y)
+						ymin = y;
+					if (xmax < x)
+						xmax = x;
+					if (ymax < y)
+						ymax = y;
+
+					// Per�metro
+					// Se pelo menos um dos quatro vizinhos n�o pertence ao mesmo label, ent�o � um pixel de contorno
+					if ((data[pos - 1] != blobs[i].label) || (data[pos + 1] != blobs[i].label) || (data[pos - bytesperline] != blobs[i].label) || (data[pos + bytesperline] != blobs[i].label))
 					{
-						// �rea
-						blobs[i].area++;
-
-						// Centro de Gravidade
-						sumx += x;
-						sumy += y;
-
-						// Bounding Box
-						if (xmin > x)
-							xmin = x;
-						if (ymin > y)
-							ymin = y;
-						if (xmax < x)
-							xmax = x;
-						if (ymax < y)
-							ymax = y;
-
-						// Per�metro
-						// Se pelo menos um dos quatro vizinhos n�o pertence ao mesmo label, ent�o � um pixel de contorno
-						if ((data[pos - 1] != blobs[i].label) || (data[pos + 1] != blobs[i].label) || (data[pos - bytesperline] != blobs[i].label) || (data[pos + bytesperline] != blobs[i].label))
-						{
-							blobs[i].perimeter++;
-						}
+						blobs[i].perimeter++;
 					}
 				}
 			}
-
-			// Bounding Box
-			blobs[i].x = xmin;
-			blobs[i].y = ymin;
-			blobs[i].width = (xmax - xmin) + 1;
-			blobs[i].height = (ymax - ymin) + 1;
-
-			// Centro de Gravidade
-			//blobs[i].xc = (xmax - xmin) / 2;
-			//blobs[i].yc = (ymax - ymin) / 2;
-			blobs[i].xc = sumx / MAX(blobs[i].area, 1);
-			blobs[i].yc = sumy / MAX(blobs[i].area, 1);
 		}
 
-		return 1;
+		// Bounding Box
+		blobs[i].x = xmin;
+		blobs[i].y = ymin;
+		blobs[i].width = (xmax - xmin) + 1;
+		blobs[i].height = (ymax - ymin) + 1;
+
+		// Centro de Gravidade
+		//blobs[i].xc = (xmax - xmin) / 2;
+		//blobs[i].yc = (ymax - ymin) / 2;
+		blobs[i].xc = sumx / MAX(blobs[i].area, 1);
+		blobs[i].yc = sumy / MAX(blobs[i].area, 1);
 	}
+
+	return 1;
+}
