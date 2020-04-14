@@ -618,33 +618,32 @@
 #pragma endregion
 
 #pragma region Erode
-// int main(void)
-// {
-//   IVC *image = vc_read_image("../ImagesTestSegmentation/coins.pgm");
-//   IVC *threshold = vc_image_new(image->width, image->height, 1, 1);
-//   IVC *result = vc_image_new(image->width, image->height, 1, 1);
+int main(void)
+{
+  IVC *image = vc_read_image("../ImagesTestSegmentation/coins.pgm");
+  IVC *threshold = vc_image_new(image->width, image->height, 1, 1);
+  IVC *result = vc_image_new(image->width, image->height, 1, 1);
 
-//   if (vc_gray_to_binary_global_mean(image, threshold) == 0)
-//   {
-//     puts("Erro!!!");
-//     getchar();
-//     return 0;
-//   }
+  if (vc_gray_to_binary_global_mean(image, threshold) == 0)
+  {
+    puts("Erro!!!");
+    getchar();
+    return 0;
+  }
 
-//   if (vc_binary_erode(threshold, result, 3) == 0)
-//   {
-//     puts("Erro!!!");
-//     getchar();
-//     return 0;
-//   }
-//   else
-//   {
-//     vc_write_image("../Results/binary(erode).pbm", result);
-//     vc_image_free(image);
-//     puts("Carregue numa tecla para sair...");
-//     getchar();
-//     return 0;
-//   }
-// }
+  if (vc_binary_erode(threshold, result, 3) == 0)
+  {
+    puts("Erro!!!");
+    getchar();
+    return 0;
+  }
+  else
+  {
+    vc_write_image("../Results/binary(erode).pbm", result);
+    vc_image_free(image);
+    puts("Carregue numa tecla para sair...");
+    getchar();
+    return 0;
+  }
+}
 #pragma endregion
-
